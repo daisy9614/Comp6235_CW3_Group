@@ -1,0 +1,74 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 50px;
+  padding: 20px;
+  color: red;
+}
+
+.App-header input {
+  color: black;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+.min-max-price {
+  padding:0;
+}
+
+.dropdown-select{
+  color:green;
+  background-color: black;
+  position: relative;
+}
+
+.dropdown-select ul {
+  width: 100%;
+  background-color: black;
+  list-style: none;
+  padding-left:0;
+  color:blue;
+  z-index: 10;
+  overflow: hidden;
+  position: absolute;
+  transition: height 1s ease;
+}
+
+.sideInfoBox{
+  border: 1px solid black;
+}
+
+#chatbox{
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 300px;
+}
+
+#exits{
+  position: absolute;
+  right: 0;
+  border: none;
+  color: blue;
+}
+
+#messagesFromMe{
+  text-align: right;
+}
+#messagesFromOthers{
+  text-align: left;
+}
