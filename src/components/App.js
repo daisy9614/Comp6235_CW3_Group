@@ -5,6 +5,8 @@ import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/App.css'
 import { Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import icon24 from './icon(24).png';
+import icon64 from './icon(64).png';
 var ReactSuperSelect = require('react-super-select');
 var uniData = [{
     "id": 1,
