@@ -193,7 +193,7 @@ class App extends Component {
     return (
         <div className="container">
           <div className="logo">
-            <img src={logo} width="130" height="120" />
+            <img src={logo} width="120" height="60" />
           </div>
           <div className="row col-md-offset-4 ">
             <ReactSuperSelect
