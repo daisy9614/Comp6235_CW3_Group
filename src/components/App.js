@@ -75,7 +75,6 @@ class App extends Component {
       this.universities.push({id:i, name: this.university_list[i]})
     }
 
-
     this.state = {
       displayHousings: housingData,
       filterState: {
@@ -86,6 +85,11 @@ class App extends Component {
         minDistanceRetail: this.closestHousingToRetail.distanceRetail,
         maxDistanceRetail: this.farestHousingToRetail.distanceRetail,
         uniName: this.university_list,
+
+        rentPreference:0,
+        safetyPreference:0,
+        distanceUniPreference:0,
+        distanceRetailPreference:0,
         alphabeticalSort: true,
       }
     }
@@ -112,6 +116,11 @@ class App extends Component {
       //vars for distance retail filter
       var minDistanceRetail = filterState.minDistanceRetail;
       var maxDistanceRetail = filterState.maxDistanceRetail;
+
+      var rentPreference = filterState.rentPreference;
+      var safetyPreference = filterState.safetyPreference;
+      var distanceUniPreference = filterState.distanceUniPreference;
+      var distanceRetailPreference = filterState.distanceRetailPreference;
 
       return (
         (minPrice <= housing.price && housing.price <= maxPrice)
@@ -155,12 +164,36 @@ class App extends Component {
     }
   }
 
+  setRentPreference = (event) => {
+    console.log("RentPreference Filter", event);
+    this.state.filterState.rentPreference = event;
+    this.applyFilters();
+  }
+
+  setSafetyPreference = (event) => {
+    console.log("safetyPreference Filter", event);
+    this.state.filterState.safetyPreference = event;
+    this.applyFilters();
+  }
+
+  setDistanceUniPreference = (event) => {
+    console.log("DistanceUniPreference Filter", event);
+    this.state.filterState.distanceUniPreference = event;
+    this.applyFilters();
+  }
+
+  setdistanceRetailPreference = (event) => {
+    console.log("distanceRetailPreference Filter", event);
+    this.state.filterState.distanceRetailPreference = event;
+    this.applyFilters();
+  }
+
   render() {
     console.log("Render App: ", this.state.displayHousings);
     return (
         <div className="container">
           <div className="logo">
-            <img src={logo} width="120" height="110" />
+            <img src={logo} width="130" height="120" />
           </div>
           <div className="row col-md-offset-4 ">
             <ReactSuperSelect
@@ -173,6 +206,8 @@ class App extends Component {
               customTagClass="dropdown-select-tag"
             />
           </div>
+
+          {/*new row*/}
 
           <div className="row">
           <div className="col-xs-4 sliderTitle"> Rent</div>
@@ -189,7 +224,7 @@ class App extends Component {
               <Range
               max={this.mostExpensiveHousing.price}
               min={this.cheapestHousing.price}
-              step={10}
+              step={5}
               defaultValue={
                 [this.cheapestHousing.price, this.mostExpensiveHousing.price]
               }
@@ -210,7 +245,7 @@ class App extends Component {
               <Range
                 max={this.farestHousingToUni.distanceUni}
                 min={this.closestHousingToUni.distanceUni}
-                step={100}
+                step={10}
                 defaultValue={
                   [this.closestHousingToUni.distanceUni, this.farestHousingToUni.distanceUni]
                 }
@@ -223,7 +258,6 @@ class App extends Component {
               </div>
 
 
-
               <div className="col-xs-4">
               <div className="col-xs-2 default">
                 <p>{this.state.filterState.minDistanceRetail}m</p>
@@ -232,7 +266,7 @@ class App extends Component {
               <Range
                 max={this.farestHousingToRetail.distanceRetail}
                 min={this.closestHousingToRetail.distanceRetail}
-                step={100}
+                step={10}
                 defaultValue={
                   [this.closestHousingToRetail.distanceRetail, this.farestHousingToRetail.distanceRetail]
                 }
@@ -246,11 +280,73 @@ class App extends Component {
           </div>
 
 
-          <div className="row map">
+          <div className="row">
               {/* Map Component */}
-            <div className="col-xs-10 col-md-offset-1 map">
+            <div className="col-xs-9  map">
               <MapComponent housings={ this.state.displayHousings} />
             </div>
+
+            {/*new col*/}
+            <div className="col-xs-3">
+              <div className = "sliderTitle"> Preference </div>
+              <div className="row">
+                <div className="col-md-offset-1 col-xs-9">
+                <div>Rent</div>
+                <Slider
+                step={1}
+                defaultValue={0}
+                onChange={this.setRentPreference}
+                />
+                </div>
+                <div className="col-xs-2 default">
+                  <p>{this.state.filterState.rentPreference}%</p>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-md-offset-1 col-xs-9">
+                <div>Safety</div>
+                <Slider
+                  step={1}
+                  defaultValue={0}
+                  onChange={this.setSafetyPreference}
+                />
+                </div>
+                <div className="col-xs-2 default">
+                  <p>{this.state.filterState.safetyPreference}%</p>
+                </div>
+                </div>
+
+                <div className="row">
+                <div className="col-md-offset-1 col-xs-9">
+                <div>Distance to University</div>
+                <Slider
+                  step={1}
+                  defaultValue={0}
+                  onChange={this.setDistanceUniPreference}
+                />
+                </div>
+                <div className="col-xs-2 default">
+                  <p>{this.state.filterState.distanceUniPreference}%</p>
+                </div>
+                </div>
+
+                <div className="row">
+                <div className="col-md-offset-1 col-xs-9">
+                <div>Distance to Retail</div>
+                <Slider
+                  step={1}
+                  defaultValue={0}
+                  onChange={this.setdistanceRetailPreference}
+                />
+                </div>
+                <div className="col-xs-2 default">
+                  <p>{this.state.filterState.distanceRetailPreference}%</p>
+                </div>
+                </div>
+            </div>
+
+
           </div>
 
 
