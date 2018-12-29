@@ -3,70 +3,38 @@ import { compose, withProps} from "recompose"
 import { withScriptjs, withGoogleMap, GoogleMap, InfoWindow, Marker } from "react-google-maps"
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/App.css'
-import { Range } from 'rc-slider';
+import Slider,{ Range } from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import icon24 from './icon(24).png';
-import icon64 from './icon(64).png';
+import logo from './Hello_world_logo.png';
 var ReactSuperSelect = require('react-super-select');
-var uniData = [{
+var housingData = [{
     "id": 1,
-    "name": "Harvard",
-    "subject": {
-      "Finance": 2,
-      "Manufacturing": 1,
-      "Agriculture": 2,
-      "Anatomy": 2,
-      "American": 2,
-    },
     "website": "http://www.hbs.edu",
-    "city": "Boston",
-    "tel": "+77059997040",
+    "uniName":"University College London",
+    "city": "London",
     "position": {
-      lat: -34.397,
-      lng: 150.644
+      lat: 52.33,
+      lng: -2.1
     },
-    "price": 50000,
-    "group": "GW4"
+    "price": 120,
+    "distanceUni": 400,
+    "distanceRetail": 750
   },{
     "id": 2,
-    "name": "Univeristy of Southampton",
-    "subject": {
-      "Agriculture": 1,
-      "Manufacturing": 3,
-      "Finance": 2,
-      "American": 1,
-    },
     "website": "www.southampton.com",
+    "uniName":"University of Southampton",
     "city": "Southampton",
-    "tel": "+77059997040",
     "position": {
-      lat: -34.597,
-      lng: 150.544
+      lat: 52.03,
+      lng: -2.2
     },
-    "price": 10000,
-    "group": "Russell Group"
-  },{
-    "id": 3,
-    "name": "Stanford",
-    "subject": {
-      "Finance": 1,
-      "Manufacturing": 2,
-      "Agriculture": 1,
-      "Anatomy": 1,
-    },
-    "website": "www.stanford.edu",
-    "city": "Stanford",
-    "tel": "+77059997040",
-    "position": {
-      lat: -34.507,
-      lng: 150.441
-    },
-    "price": 30000,
-    "group": "Russell Group"
+    "price": 150,
+    "distanceUni": 700,
+    "distanceRetail": 550
   }
 ].sort(function(a,b) {
-    var x = a.name.toLowerCase();
-    var y = b.name.toLowerCase();
+    var x = a.city.toLowerCase();
+    var y = b.city.toLowerCase();
     return x < y ? -1 : x > y ? 1 : 0;
 });
 
@@ -75,44 +43,49 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.cheapestUni = uniData.reduce( (prev, curr) => {
-      return prev.price < curr.price ? prev : curr;
+    this.cheapestHousing = housingData.reduce( (prev, curr) => {
+      return prev.price <= curr.price ? prev : curr;
     })
 
-    this.mostExpensiveUni = uniData.reduce( (prev, curr) => {
-      return prev.price > curr.price ? prev : curr;
+    this.mostExpensiveHousing = housingData.reduce( (prev, curr) => {
+      return prev.price >= curr.price ? prev : curr;
+    })
+
+    this.closestHousingToUni = housingData.reduce( (prev, curr) => {
+      return prev.distanceUni <= curr.distanceUni ? prev : curr;
+    })
+
+    this.farestHousingToUni = housingData.reduce( (prev, curr) => {
+      return prev.distanceUni >= curr.distanceUni ? prev : curr;
+    })
+
+    this.closestHousingToRetail = housingData.reduce( (prev, curr) => {
+      return prev.distanceRetail <= curr.distanceRetail ? prev : curr;
+    })
+
+    this.farestHousingToRetail = housingData.reduce( (prev, curr) => {
+      return prev.distanceRetail >= curr.distanceRetail ? prev : curr;
     })
 
 
-    // I need: alphabetically sorted group and subject lists
-    this.group_list = ["GW4", "1994 Group", "M5 Universities", "White Rose University Consortium", "Oxbridge", "Million Plus", "N8 Research Partnership", "ABSA", "Science and Engineering South", "University Alliane", "NCUK", "Cathedrals Group", "Russell Group"].sort()
-    this.groups = []
-    for (var i=0; i < this.group_list.length; i++) {
-      this.groups.push({id:i, name: this.group_list[i]})
+    // I need: alphabetically sorted university lists
+    this.university_list = ["All Universities","University of Birmingham", "University of Bristol", "University of Cambridge", "Cardiff University", "Durham University", "University of Edinburgh", "University of Exeter", "University of Glasgow", "Imperial College London", "King's College London", "University of Leeds", "University of Liverpool", "London School of Economics", "University of Manchester", "Newcastle University", "University of Nottingham", "University of Oxford", "Queen's University Belfast", "University of Sheffield", "University of Southampton", "University College London", "University of Warwick", "University of York"].sort()
+    this.universities = []
+    for (var i=0; i < this.university_list.length; i++) {
+      this.universities.push({id:i, name: this.university_list[i]})
     }
 
-    this.subject_list = ["Overall", "Finance", "Manufacturing", "Agriculture", "American", "Anatomy",
-             "Anthropology", "Archeology", "Architecture", "Art", "Aural", "Biological", "Building",
-             "Business", "Celtic", "Chemical", "Chemistry", "Civil", "Classics", "Communication", "Complementary", "Computer",
-             "Creative", "Drama", "East", "Economics", "Education", "Electrical", "English", "Food",
-             "Forensic", "French", "General", "Geography", "Geology", "German", "History", "HistoryArt",
-             "Hospitality", "Iberian", "Italian", "Land", "Law", "Librarianship", "Linguistics", "Marketing", "Materials", "Mathematics",
-             "MechanicalEngineering", "MedicalTechnology", "Medicine", "Middle",
-             "Music", "Nursing", "OccupationalTherapy", "Optometry", "Pharmacology", "Philosophy",
-             "Physics", "Physiotherapy", "Politics", "Psychology", "Russian", "SocialPolicy", "SocialWork", "Sociology", "Sports", "Theology", "Town", "Veterinary"].sort()
-    this.subjects = []
-    for (var i=0; i < this.subject_list.length; i++) {
-      this.subjects.push({id:i, name: this.subject_list[i]})
-    }
 
     this.state = {
-      displayedUnies: uniData,
+      displayHousings: housingData,
       filterState: {
-        searchQueryName: "",
-        minPrice: this.cheapestUni.price,
-        maxPrice: this.mostExpensiveUni.price,
-        group: this.group_list,
-        subject: this.subject_list,
+        minPrice: this.cheapestHousing.price,
+        maxPrice: this.mostExpensiveHousing.price,
+        minDistanceUni: this.closestHousingToUni.distanceUni,
+        maxDistanceUni: this.farestHousingToUni.distanceUni,
+        minDistanceRetail: this.closestHousingToRetail.distanceRetail,
+        maxDistanceRetail: this.farestHousingToRetail.distanceRetail,
+        uniName: this.university_list,
         alphabeticalSort: true,
       }
     }
@@ -122,31 +95,32 @@ class App extends Component {
   // apply filters
   applyFilters = () => {
     var filterState = this.state.filterState;
-    var displayedUnies = uniData.filter( uni => {
-      // vars for name filter
-      var searchQueryName = filterState.searchQueryName;
-      console.log("NameName", searchQueryName);
-      var uniName = uni.name.toLowerCase();
+    var displayHousings = housingData.filter( housing => {
+
+      var universityQuery = filterState.uniName[0];
+      //if all university show all
+      if(universityQuery == "All Universities"){
+        universityQuery = "";
+      }
+      console.log("here: " + universityQuery);
       // vars for price filter
       var minPrice = filterState.minPrice;
       var maxPrice = filterState.maxPrice;
-      // TODO how it filters after Clearing subj Filter
-      var subjectQuery = filterState.subject[0];
-      // console.log("Group Includes: " , filterState.group, "looking for a uni group: ", uni.group)
+      //vars for distance uni filter
+      var minDistanceUni = filterState.minDistanceUni;
+      var maxDistanceUni = filterState.maxDistanceUni;
+      //vars for distance retail filter
+      var minDistanceRetail = filterState.minDistanceRetail;
+      var maxDistanceRetail = filterState.maxDistanceRetail;
+
       return (
-        (uniName.indexOf(searchQueryName) !== -1)
-        && (minPrice <= uni.price && uni.price <= maxPrice)
-        && (filterState.group.includes(uni.group))
-        && (uni.subject[subjectQuery] !== undefined)
+        (minPrice <= housing.price && housing.price <= maxPrice)
+        &&(minDistanceUni <= housing.distanceUni && housing.distanceUni <= maxDistanceUni)
+        &&(minDistanceRetail <= housing.distanceRetail && housing.distanceRetail <= maxDistanceRetail)
+        && (housing.uniName.includes(universityQuery))
       )
     })
-    this.setState({displayedUnies: displayedUnies});
-  }
-
-  setNameFilter = (event) => {
-    console.log("Name Filter", event.target.value);
-    this.state.filterState.searchQueryName = event.target.value.toLowerCase();
-    this.applyFilters();
+    this.setState({displayHousings: displayHousings});
   }
 
   setPriceFilter = (event) => {
@@ -156,45 +130,126 @@ class App extends Component {
     this.applyFilters();
   }
 
-  setGroupFilter = (item) => {
-    if (item) {
-      console.log("Set Group Filter: ", [item.name]);
-      this.state.filterState.group = [item.name];
-      this.applyFilters();
-    } else {
-      this.state.filterState.group = this.group_list;
-      this.applyFilters();
-    }
+  setUniDistanceFilter = (event) => {
+    console.log("UniDistance Filter", event[0], event[1]);
+    this.state.filterState.minDistanceUni = event[0];
+    this.state.filterState.maxDistanceUni = event[1];
+    this.applyFilters();
   }
 
-  setSubjectFilter = (item) => {
+  setRetailDistanceFilter = (event) => {
+    console.log("RetailDistance Filter", event[0], event[1]);
+    this.state.filterState.minDistanceRetail = event[0];
+    this.state.filterState.maxDistanceRetail = event[1];
+    this.applyFilters();
+  }
+
+  setUniversityFilter = (item) => {
     if (item) {
-      console.log("Set Subject Filter: ", [item.name]);
-      this.state.filterState.subject = [item.name];
-      this.state.filterState.alphabeticalSort = false;
+      console.log("Set university Filter: ", [item.name]);
+      this.state.filterState.uniName = [item.name];
       this.applyFilters();
     } else {
-      this.state.filterState.alphabeticalSort = true;
-      this.state.filterState.subject = this.subject_list;
+      this.state.filterState.uniName = this.university_list;
       this.applyFilters();
     }
   }
 
   render() {
-    console.log("Render App: ", this.state.displayedUnies);
+    console.log("Render App: ", this.state.displayHousings);
     return (
         <div className="container">
+          <div className="logo">
+            <img src={logo} width="120" height="110" />
+          </div>
+          <div className="row col-md-offset-4 ">
+            <ReactSuperSelect
+              placeholder="Select an University"
+              onChange={this.setUniversityFilter}
+              //TODO: onClear to check if needed
+              onClear={this.setUniversityFilter}
+              dataSource={this.universities}
+              customClass="dropdown-select"
+              customTagClass="dropdown-select-tag"
+            />
+          </div>
+
+          <div className="row">
+          <div className="col-xs-4 sliderTitle"> Rent</div>
+          <div className="col-xs-4 sliderTitle"> Distance to University</div>
+          <div className="col-xs-4 sliderTitle"> Distance to Retail</div>
+          </div>
+
+          <div className="row">
+            <div className="col-xs-4">
+              <div className="col-xs-2 default">
+                <p>£{this.state.filterState.minPrice}</p>
+              </div>
+              <div className="col-xs-8">
+              <Range
+              max={this.mostExpensiveHousing.price}
+              min={this.cheapestHousing.price}
+              step={10}
+              defaultValue={
+                [this.cheapestHousing.price, this.mostExpensiveHousing.price]
+              }
+              onChange={this.setPriceFilter}
+              />
+              </div>
+              <div className="col-xs-2 default">
+                <p>£{this.state.filterState.maxPrice}</p>
+              </div>
+            </div>
+
+
+            <div className="col-xs-4">
+              <div className="col-xs-2 default">
+                <p>{this.state.filterState.minDistanceUni}m</p>
+              </div>
+              <div className="col-xs-8">
+              <Range
+                max={this.farestHousingToUni.distanceUni}
+                min={this.closestHousingToUni.distanceUni}
+                step={100}
+                defaultValue={
+                  [this.closestHousingToUni.distanceUni, this.farestHousingToUni.distanceUni]
+                }
+                onChange={this.setUniDistanceFilter}
+              />
+              </div>
+              <div className="col-xs-2 default">
+                <p>{this.state.filterState.maxDistanceUni}m</p>
+              </div>
+              </div>
+
+
+
+              <div className="col-xs-4">
+              <div className="col-xs-2 default">
+                <p>{this.state.filterState.minDistanceRetail}m</p>
+              </div>
+              <div className="col-xs-8">
+              <Range
+                max={this.farestHousingToRetail.distanceRetail}
+                min={this.closestHousingToRetail.distanceRetail}
+                step={100}
+                defaultValue={
+                  [this.closestHousingToRetail.distanceRetail, this.farestHousingToRetail.distanceRetail]
+                }
+                onChange={this.setRetailDistanceFilter}
+              />
+              </div>
+              <div className="col-xs-2 default">
+                <p>{this.state.filterState.maxDistanceRetail}m</p>
+              </div>
+              </div>
+          </div>
+
+
           <div className="row map">
               {/* Map Component */}
-            <div className="col-xs-8 map">
-              <MapComponent universities={ this.state.displayedUnies} />
-            </div>
-            <div className="col-xs-4 map">
-              <SidePaneInfo
-                universities={ this.state.displayedUnies}
-                subject={this.state.filterState.subject[0]}
-                alphabeticalSort={this.state.filterState.alphabeticalSort}
-              />
+            <div className="col-xs-10 col-md-offset-1 map">
+              <MapComponent housings={ this.state.displayHousings} />
             </div>
           </div>
 
@@ -204,49 +259,25 @@ class App extends Component {
   }
 }
 
-class SidePaneInfo extends Component {
-  render() {
-    // if a subject is chosen then by rank, otherwise alphabetically
-    if (!this.props.alphabeticalSort) {
-      var subject = this.props.subject;
-      var displayedUnies = this.props.universities.sort((a,b) => {
-          return a.subject[subject] - b.subject[subject];
-        });
-    } else {
-      var displayedUnies = this.props.universities;
-    }
-
-    return (
-      <div>
-        {
-
-        }
-      </div>
-    )
-  }
-}
-
-
-
 const MapComponent = compose(
-  //   //TODO: Renew token: AIzaSyDGHHha2rmP8WOTrvDGaEpZlPNtV2m-rs
+
   withProps({
     googleMapURL: "https://maps.googleapis.com/maps/api/js?key=AIzaSyCBW4NoLJP651nz9MnszKz9mlftP4VMh1U&callback=initMap",
     loadingElement: <div style={{ height: `100%` }} />,
-    containerElement: <div style={{ height: `400px` }} />,
+    containerElement: <div style={{ height: `600px` }} />,
     mapElement: <div style={{ height: `100%` }} />,
-    center: { lat: 25.03, lng: 121.6 },
+    center: { lat: 53.03, lng: -2.1 },
   }),
   withScriptjs,
   withGoogleMap
 )(props =>
   <GoogleMap
-    defaultZoom={8}
-    defaultCenter={{ lat: -34.397, lng: 150.644 }}
+    defaultZoom={6.1}
+    defaultCenter={{ lat: 53.03, lng: -2.1 }}
   >
-    {props.universities.map((uni) => {
+    {props.housings.map((housing) => {
         return(
-            <CustomerMarkerAndInfo key={uni.id} uni = { uni }/>
+            <CustomerMarkerAndInfo key={housing.id} housing = { housing }/>
           )
         }
       )
@@ -260,53 +291,48 @@ class CustomerMarkerAndInfo extends Component {
     this.state = {
         isOpen: false,
         hovered: false,
-        icon: icon24
+
     };
   }
   onClickOpen=()=>{
     if(this.state.isOpen === true){
-      this.setState({isOpen: !this.state.isOpen, hovered: false, icon: icon24});
+      this.setState({isOpen: !this.state.isOpen, hovered: false});
     }
     else{
-      this.setState({isOpen: !this.state.isOpen, hovered: false, icon: icon64});
+      this.setState({isOpen: !this.state.isOpen, hovered: false});
     }
   }
   onHoverOver=()=>{
     if(this.state.isOpen === false && this.state.hovered === false){
-      this.setState({isOpen: false, hovered: true, icon: icon64});
+      this.setState({isOpen: false, hovered: true});
     }
   }
   onHoverOut=()=>{
     if(this.state.isOpen === false && this.state.hovered === true){
-      this.setState({isOpen: false, hovered: false, icon: icon24});
+      this.setState({isOpen: false, hovered: false});
     }
   }
   render() {
     return (
       <Marker key={this.state.isOpen}
-              position={this.props.uni.position}
+              position={this.props.housing.position}
               onClick={this.onClickOpen.bind(this)}
               onMouseOver={this.onHoverOver.bind(this)}
               onMouseOut={this.onHoverOut.bind(this)}
-              //icon ={this.state.icon}
+              icon ={this.state.icon}
               >
           {this.state.hovered && <InfoWindow>
-                                      <span><b>{this.props.uni.name}</b>
+                                      <span><b>{this.props.housing.city} / {this.props.housing.uniName}</b>
                                       <br/>Click to view more info
                                       </span></InfoWindow>}
           {this.state.isOpen && <InfoWindow onCloseClick={this.onClickOpen.bind(this)}>
-                                      <span><b>{this.props.uni.name}</b>
-                                      <br/>{this.props.uni.tel}
-                                      <br/><a href={this.props.uni.website} target='_blank'>{this.props.uni.website}</a>
+                                      <span><b>{this.props.housing.city} / {this.props.housing.uniName}</b>
+                                      <br/>{this.props.housing.tel}
+                                      <br/><a href={this.props.housing.website} target='_blank'>{this.props.housing.website}</a>
                                       </span></InfoWindow>}
           </Marker>
         )
     }
 }
-
-// <div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from
-// <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by
-// <a href="http://creativecommons.org/licenses/by/3.0/"
-// title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 
 export default App;
