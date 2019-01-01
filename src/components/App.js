@@ -18,7 +18,7 @@ var housingData = [{
     },
     "price": 120,
     "distanceUni": 400,
-    "distanceRetail": 750
+    "retailCount": 4
   },{
     "id": 2,
     "website": "www.southampton.com",
@@ -30,7 +30,7 @@ var housingData = [{
     },
     "price": 150,
     "distanceUni": 700,
-    "distanceRetail": 550
+    "retailCount": 7
   }
 ].sort(function(a,b) {
     var x = a.city.toLowerCase();
@@ -59,12 +59,12 @@ class App extends Component {
       return prev.distanceUni >= curr.distanceUni ? prev : curr;
     })
 
-    this.closestHousingToRetail = housingData.reduce( (prev, curr) => {
-      return prev.distanceRetail <= curr.distanceRetail ? prev : curr;
+    this.minHousingRetail = housingData.reduce( (prev, curr) => {
+      return prev.retailCount <= curr.retailCount ? prev : curr;
     })
 
-    this.farestHousingToRetail = housingData.reduce( (prev, curr) => {
-      return prev.distanceRetail >= curr.distanceRetail ? prev : curr;
+    this.maxHousingRetail = housingData.reduce( (prev, curr) => {
+      return prev.retailCount >= curr.retailCount ? prev : curr;
     })
 
 
@@ -82,14 +82,14 @@ class App extends Component {
         maxPrice: this.mostExpensiveHousing.price,
         minDistanceUni: this.closestHousingToUni.distanceUni,
         maxDistanceUni: this.farestHousingToUni.distanceUni,
-        minDistanceRetail: this.closestHousingToRetail.distanceRetail,
-        maxDistanceRetail: this.farestHousingToRetail.distanceRetail,
+        minRetailCount: this.minHousingRetail.retailCount,
+        maxRetailCount: this.maxHousingRetail.retailCount,
         uniName: this.university_list,
 
         rentPreference:0,
         safetyPreference:0,
         distanceUniPreference:0,
-        distanceRetailPreference:0,
+        retailCountPreference:0,
         alphabeticalSort: true,
       }
     }
@@ -114,18 +114,18 @@ class App extends Component {
       var minDistanceUni = filterState.minDistanceUni;
       var maxDistanceUni = filterState.maxDistanceUni;
       //vars for distance retail filter
-      var minDistanceRetail = filterState.minDistanceRetail;
-      var maxDistanceRetail = filterState.maxDistanceRetail;
+      var minRetailCount = filterState.minRetailCount;
+      var maxRetailCount = filterState.maxRetailCount;
 
       var rentPreference = filterState.rentPreference;
       var safetyPreference = filterState.safetyPreference;
       var distanceUniPreference = filterState.distanceUniPreference;
-      var distanceRetailPreference = filterState.distanceRetailPreference;
+      var retailCountPreference = filterState.retailCountPreference;
 
       return (
         (minPrice <= housing.price && housing.price <= maxPrice)
         &&(minDistanceUni <= housing.distanceUni && housing.distanceUni <= maxDistanceUni)
-        &&(minDistanceRetail <= housing.distanceRetail && housing.distanceRetail <= maxDistanceRetail)
+        &&(minRetailCount <= housing.retailCount && housing.retailCount <= maxRetailCount)
         && (housing.uniName.includes(universityQuery))
       )
     })
@@ -146,10 +146,10 @@ class App extends Component {
     this.applyFilters();
   }
 
-  setRetailDistanceFilter = (event) => {
+  setRetailCountFilter = (event) => {
     console.log("RetailDistance Filter", event[0], event[1]);
-    this.state.filterState.minDistanceRetail = event[0];
-    this.state.filterState.maxDistanceRetail = event[1];
+    this.state.filterState.minRetailCount = event[0];
+    this.state.filterState.maxRetailCount = event[1];
     this.applyFilters();
   }
 
@@ -182,9 +182,9 @@ class App extends Component {
     this.applyFilters();
   }
 
-  setdistanceRetailPreference = (event) => {
-    console.log("distanceRetailPreference Filter", event);
-    this.state.filterState.distanceRetailPreference = event;
+  setRetailCountPreference = (event) => {
+    console.log("retailCountPreference Filter", event);
+    this.state.filterState.retailCountPreference = event;
     this.applyFilters();
   }
 
@@ -212,7 +212,7 @@ class App extends Component {
           <div className="row">
           <div className="col-xs-4 sliderTitle"> Rent</div>
           <div className="col-xs-4 sliderTitle"> Distance to University</div>
-          <div className="col-xs-4 sliderTitle"> Distance to Retail</div>
+          <div className="col-xs-4 sliderTitle"> Retail Number (less than 1km)</div>
           </div>
 
           <div className="row">
@@ -260,24 +260,26 @@ class App extends Component {
 
               <div className="col-xs-4">
               <div className="col-xs-2 default">
-                <p>{this.state.filterState.minDistanceRetail}m</p>
+                <p>{this.state.filterState.minRetailCount}</p>
               </div>
               <div className="col-xs-8">
               <Range
-                max={this.farestHousingToRetail.distanceRetail}
-                min={this.closestHousingToRetail.distanceRetail}
-                step={10}
+                max={this.maxHousingRetail.retailCount}
+                min={this.minHousingRetail.retailCount}
+                step={1}
                 defaultValue={
-                  [this.closestHousingToRetail.distanceRetail, this.farestHousingToRetail.distanceRetail]
+                  [this.minHousingRetail.retailCount, this.maxHousingRetail.retailCount]
                 }
-                onChange={this.setRetailDistanceFilter}
+                onChange={this.setRetailCountFilter}
               />
               </div>
               <div className="col-xs-2 default">
-                <p>{this.state.filterState.maxDistanceRetail}m</p>
+                <p>{this.state.filterState.maxRetailCount}</p>
               </div>
               </div>
           </div>
+
+
 
 
           <div className="row">
@@ -337,11 +339,11 @@ class App extends Component {
                 <Slider
                   step={1}
                   defaultValue={0}
-                  onChange={this.setdistanceRetailPreference}
+                  onChange={this.setRetailCountPreference}
                 />
                 </div>
                 <div className="col-xs-2 default">
-                  <p>{this.state.filterState.distanceRetailPreference}%</p>
+                  <p>{this.state.filterState.retailCountPreference}%</p>
                 </div>
                 </div>
             </div>
