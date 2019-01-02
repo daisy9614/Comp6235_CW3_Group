@@ -9,32 +9,28 @@ import logo from './Hello_world_logo.png';
 var ReactSuperSelect = require('react-super-select');
 var housingData = [{
     "id": 1,
-    "website": "http://www.hbs.edu",
-    "uniName":"University College London",
-    "city": "London",
-    "position": {
-      lat: 52.33,
-      lng: -2.1
-    },
+    "details_url": "http://www.hbs.edu",
+    "post_town": "London",
+
+    "Latitude": 52.33,
+    "Longitude": -2.1,
     "price": 120,
-    "distanceUni": 400,
-    "distanceRetail": 750
+    "Distance_to_School": 400,
+    "Store_Num": 750
   },{
     "id": 2,
-    "website": "www.southampton.com",
-    "uniName":"University of Southampton",
-    "city": "Southampton",
-    "position": {
-      lat: 52.03,
-      lng: -2.2
-    },
+    "details_url": "www.southampton.com",
+    "post_town": "Southampton",
+
+    "Latitude": 52.03,
+    "Longitude": -2.2,
     "price": 150,
-    "distanceUni": 700,
-    "distanceRetail": 550
+    "Distance_to_School": 700,
+    "Store_Num": 550
   }
 ].sort(function(a,b) {
-    var x = a.city.toLowerCase();
-    var y = b.city.toLowerCase();
+    var x = a.post_town.toLowerCase();
+    var y = b.post_town.toLowerCase();
     return x < y ? -1 : x > y ? 1 : 0;
 });
 
@@ -42,6 +38,7 @@ var housingData = [{
 class App extends Component {
   constructor(props) {
     super(props);
+
 
     this.cheapestHousing = housingData.reduce( (prev, curr) => {
       return prev.price <= curr.price ? prev : curr;
@@ -52,19 +49,19 @@ class App extends Component {
     })
 
     this.closestHousingToUni = housingData.reduce( (prev, curr) => {
-      return prev.distanceUni <= curr.distanceUni ? prev : curr;
+      return prev.Distance_to_School <= curr.Distance_to_School ? prev : curr;
     })
 
     this.farestHousingToUni = housingData.reduce( (prev, curr) => {
-      return prev.distanceUni >= curr.distanceUni ? prev : curr;
+      return prev.Distance_to_School >= curr.Distance_to_School ? prev : curr;
     })
 
     this.closestHousingToRetail = housingData.reduce( (prev, curr) => {
-      return prev.distanceRetail <= curr.distanceRetail ? prev : curr;
+      return prev.Store_Num <= curr.Store_Num ? prev : curr;
     })
 
     this.farestHousingToRetail = housingData.reduce( (prev, curr) => {
-      return prev.distanceRetail >= curr.distanceRetail ? prev : curr;
+      return prev.Store_Num >= curr.Store_Num ? prev : curr;
     })
 
 
@@ -80,10 +77,10 @@ class App extends Component {
       filterState: {
         minPrice: this.cheapestHousing.price,
         maxPrice: this.mostExpensiveHousing.price,
-        minDistanceUni: this.closestHousingToUni.distanceUni,
-        maxDistanceUni: this.farestHousingToUni.distanceUni,
-        minDistanceRetail: this.closestHousingToRetail.distanceRetail,
-        maxDistanceRetail: this.farestHousingToRetail.distanceRetail,
+        minDistanceUni: this.closestHousingToUni.Distance_to_School,
+        maxDistanceUni: this.farestHousingToUni.Distance_to_School,
+        minDistanceRetail: this.closestHousingToRetail.Store_Num,
+        maxDistanceRetail: this.farestHousingToRetail.Store_Num,
         uniName: this.university_list,
 
         rentPreference:0,
@@ -91,14 +88,111 @@ class App extends Component {
         distanceUniPreference:0,
         distanceRetailPreference:0,
         alphabeticalSort: true,
-      }
+      },
+      uni: null,
+      school:''
     }
   };
+
+  // componentDidMount() {
+  //   fetch('http://localhost:5000/test'
+  //   // , { 
+  //   //   method: 'GET',
+  //   //   headers:{
+  //   //     'Access-Control-Allow-Origin': '*',
+  //   //     'Access-Control-Allow-Credentials':true,
+  //   //     'Access-Control-Allow-Methods':'POST, GET'
+  //   //   }
+  //   // }
+  //   )
+  //     .then(res => {
+  //       console.log(res);
+  //       return res.text();
+  //     })
+  //     .then(data => {
+  //       console.log(data);
+  //       this.setState({ data });
+  //     });
+  //     }
+  handleGet = event => {
+    event.preventDefault();
+    this.houseGet(this.state.filterState.rentPreference,
+                  this.state.filterState.safetyPreference,
+                  this.state.filterState.distanceUniPreference,
+                  this.state.filterState.distanceRetailPreference)   
+
+  }
+
+  handlePost = event => {
+      event.preventDefault();
+        this.housePost(this.state.school)
+    }
+
+  handleChange = event => {
+        this.setState({
+            [event.target.id]: event.target.value
+        });
+    }
+
+  async houseGet (rent, safety, disUni, disRetail){
+    // console.log(rent, safety, disRetail, disUni)
+    if (rent === 0 && safety === 0 && disUni === 0 && disRetail === 0) {
+      rent = safety = disUni = disRetail = 100;
+    }
+    var total = rent + safety + disRetail + disUni
+    var rent_s = rent/total;
+    var safety_s = safety/total;
+    var disRetail_s = disRetail/total;
+    var disUni_s = disUni/total;
+    //console.log(total, rent_s, safety_s, disRetail_s, disUni_s);
+    try{ await fetch(`http://localhost:4000/api/get?rent=${rent_s}&safety=${safety_s}&disUni=${disUni_s}&disRetail=${disRetail_s}`
+      // {
+      //     method: 'GET',
+      //     headers: {
+      //       "Content-Type": "application/json"
+      //     }
+            
+    
+      // }
+      )
+      .then(res => res.json()
+      )
+      .then(uni => 
+
+          //console.log(uni);
+          // (this.setState({uni: uni}))
+          (housingData = uni)
+          //console.log(uni);
+      )} 
+      catch (e) {
+      alert(e);
+      }
+      
+
+
+    this.applyFilters();
+      
+  }
+
+  // housePost(school) {
+  //       console.log(school);
+  //       fetch(`http://localhost:4000/api/post?school=${school}`)
+  //           .then(res => res.text())
+  //           .then(uni => {
+  //               console.log(uni)
+  //               this.setState({ uni });
+  //           })
+  //           .catch(err => console.error(err))
+  //   }
+
+  
 
 
   // apply filters
   applyFilters = () => {
     var filterState = this.state.filterState;
+    
+    console.log('++++++++++', filterState);
     var displayHousings = housingData.filter( housing => {
 
       var universityQuery = filterState.uniName[0];
@@ -124,11 +218,11 @@ class App extends Component {
 
       return (
         (minPrice <= housing.price && housing.price <= maxPrice)
-        &&(minDistanceUni <= housing.distanceUni && housing.distanceUni <= maxDistanceUni)
-        &&(minDistanceRetail <= housing.distanceRetail && housing.distanceRetail <= maxDistanceRetail)
-        && (housing.uniName.includes(universityQuery))
+        &&(minDistanceUni <= housing.Distance_to_School && housing.Distance_to_School <= maxDistanceUni)
+        &&(minDistanceRetail <= housing.Store_Num && housing.Store_Num <= maxDistanceRetail)
       )
     })
+    //console.log('666666', displayHousings)
     this.setState({displayHousings: displayHousings});
   }
 
@@ -243,11 +337,11 @@ class App extends Component {
               </div>
               <div className="col-xs-8">
               <Range
-                max={this.farestHousingToUni.distanceUni}
-                min={this.closestHousingToUni.distanceUni}
+                max={this.farestHousingToUni.Distance_to_School}
+                min={this.closestHousingToUni.Distance_to_School}
                 step={10}
                 defaultValue={
-                  [this.closestHousingToUni.distanceUni, this.farestHousingToUni.distanceUni]
+                  [this.closestHousingToUni.Distance_to_School, this.farestHousingToUni.Distance_to_School]
                 }
                 onChange={this.setUniDistanceFilter}
               />
@@ -264,11 +358,11 @@ class App extends Component {
               </div>
               <div className="col-xs-8">
               <Range
-                max={this.farestHousingToRetail.distanceRetail}
-                min={this.closestHousingToRetail.distanceRetail}
+                max={this.farestHousingToRetail.Store_Num}
+                min={this.closestHousingToRetail.Store_Num}
                 step={10}
                 defaultValue={
-                  [this.closestHousingToRetail.distanceRetail, this.farestHousingToRetail.distanceRetail]
+                  [this.closestHousingToRetail.Store_Num, this.farestHousingToRetail.Store_Num]
                 }
                 onChange={this.setRetailDistanceFilter}
               />
@@ -346,6 +440,12 @@ class App extends Component {
                 </div>
             </div>
 
+            {/* <form>
+              <input id='school' value={this.state.school || ''} onChange={this.handleChange}></input>
+              <button onClick={this.handlePost}>post</button>
+              <button onClick={this.handleGet}>get</button>
+            </form> */}
+            <button onClick={this.handleGet}>Submit</button>
 
           </div>
 
@@ -387,6 +487,10 @@ class CustomerMarkerAndInfo extends Component {
     this.state = {
         isOpen: false,
         hovered: false,
+        position: {
+          lat: this.props.housing.Latitude,
+          lng: this.props.housing.Longitude
+        },
 
     };
   }
@@ -408,23 +512,25 @@ class CustomerMarkerAndInfo extends Component {
       this.setState({isOpen: false, hovered: false});
     }
   }
+  
   render() {
+    console.log('-------------', this.state.position);
     return (
       <Marker key={this.state.isOpen}
-              position={this.props.housing.position}
+              position={this.state.position}
               onClick={this.onClickOpen.bind(this)}
               onMouseOver={this.onHoverOver.bind(this)}
               onMouseOut={this.onHoverOut.bind(this)}
               icon ={this.state.icon}
               >
           {this.state.hovered && <InfoWindow>
-                                      <span><b>{this.props.housing.city} / {this.props.housing.uniName}</b>
+                                      <span><b>{this.props.housing.post_town} / {this.state.filterState.uniName}</b>
                                       <br/>Click to view more info
                                       </span></InfoWindow>}
           {this.state.isOpen && <InfoWindow onCloseClick={this.onClickOpen.bind(this)}>
-                                      <span><b>{this.props.housing.city} / {this.props.housing.uniName}</b>
+                                      <span><b>{this.props.housing.post_town} / {this.state.filterState.uniName}</b>
                                       <br/>{this.props.housing.tel}
-                                      <br/><a href={this.props.housing.website} target='_blank'>{this.props.housing.website}</a>
+                                      <br/><a href={this.props.housing.details_url} target='_blank'>{this.props.housing.details_url}</a>
                                       </span></InfoWindow>}
           </Marker>
         )
