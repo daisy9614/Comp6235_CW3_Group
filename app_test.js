@@ -41,30 +41,37 @@ app.use(function (req, res, next) {
 
 app.get('/api/get', function (req, res) {
   // connection.connect();
-  const {rent, safety, disUni, disRetail} = req.query;
-  console.log(rent, safety, disUni, disRetail);
-  const sql = `SELECT * from uni_durham ORDER BY Price_Score*${rent} + Distance_to_School_Score*${disUni} + Store_Num_Score*${disRetail} + Crime_Score*${safety} DESC LIMIT 1`;
-  //const sql = `SELECT Price_Score*0.2 + Distance_to_School_Score*0.2 + Store_Num_Score*0.2 + Crime_Score*0.2 as total_score FROM uni_durham ORDER BY total_score DESC`;
-  //const sql = `SELECT * FROM uni_durham WHERE id = 1`;
+  const {uni, rent, safety, disUni, disRetail, minPrice, maxPrice, minDisUni, maxDisUni, minDisRetail, maxDisRetail} = req.query;
+  console.log(uni, rent, safety, disUni, disRetail, minPrice, maxPrice, minDisUni, maxDisUni, minDisRetail, maxDisRetail);
+
+  const sql = `select * from ${uni} where postcode IN (select h.postcode from \
+              (select distinct postcode, Price_Score, Crime_Score, Distance_to_School_Score, \
+              Store_Num_Score from ${uni} WHERE avg_price BETWEEN ${minPrice} AND \
+              ${maxPrice} AND Distance_to_School BETWEEN ${minDisUni} AND ${maxDisUni} \
+              AND Store_Num BETWEEN ${minDisRetail} AND ${maxDisRetail} ORDER BY \
+              Price_Score*${rent} + Distance_to_School_Score*${disUni} \
+              + Store_Num_Score*${disRetail} + Crime_Score*${safety} DESC LIMIT 10) AS h)`
+
   connection.query(sql, function (error, results) {
       if (error) throw error;
       //results = JSON.stringify(results)
-      console.log(results)
+      //console.log(results)
       res.send(results)
   });
   // connection.end();
 });
 // Start the server
 
-app.get('/api/post', function (req, res) {
-  connection.connect();
-  const { school } = req.query;
-  const sql = `SELECT * FROM ${school} WHERE id = 1`;
+app.get('/api/getuni', function (req, res) {
+
+  const { uni } = req.query;
+  const sql = `select max(avg_price),min(avg_price),max(Distance_to_School), min(Distance_to_School), max(Store_Num), min(Store_Num) from ${uni};`;
   connection.query(sql, function (error, results) {
       if (error) throw error;
+      //console.log(results)
       res.send(results)
   });
-  connection.end();
+
 });
 
 app.listen(4000, () => {

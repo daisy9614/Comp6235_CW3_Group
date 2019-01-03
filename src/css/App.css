@@ -21,12 +21,13 @@
   background-color: white;
   font-weight: bold;
   border: 1px solid black;
-  width: 40%;
+  width: 80%;
   overflow: hidden;
+  margin:0 auto;
 }
 
 .dropdown-select ul {
-  width: 21.5%;
+  width: 80%;
   background-color: white;
   list-style: none;
   padding-left:0;
@@ -37,8 +38,17 @@
   position: absolute;
   transition: height 1s ease;
   border: 1px solid black;
+  margin:0 auto;
 }
 
 .row{
   margin-bottom:5px;
 }
+
+.button {
+  margin:0 auto;
+  display: block;
+
+}
+
+
