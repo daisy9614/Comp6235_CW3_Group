@@ -11,35 +11,14 @@ var ReactSuperSelect = require('react-super-select');
 const createSliderWithTooltip = Slider.createSliderWithTooltip;
 const Range = createSliderWithTooltip(Slider.Range);
 
-var housingData = [
-//   {
-//     "id": 1,
-//     "details_url": "http://www.hbs.edu",
-//     "post_town": "London",
-
-//     "Latitude": 51.5074,
-//     "Longitude": 0.1278,
-//     "avg_price": 0,
-//     "Distance_to_School": 0,
-//     "Store_Num": 0
-// }
-  // },{
-  //   "id": 2,
-  //   "details_url": "www.southampton.com",
-  //   "post_town": "Southampton",
-
-  //   "Latitude": 52.03,
-  //   "Longitude": -2.2,
-  //   "avg_price": 30,
-  //   "Distance_to_School": 10000,
-  //   "Store_Num": 20
-  // }
-].sort(function(a,b) {
+// Initialize Housing data
+var housingData = [].sort(function(a,b) {
     var x = a.post_town.toLowerCase();
     var y = b.post_town.toLowerCase();
     return x < y ? -1 : x > y ? 1 : 0;
 });
 
+// Initialize the overall informaiton of selected university
 var uni_overall_info = [
   {
     'min(avg_price)': 0,
@@ -51,6 +30,7 @@ var uni_overall_info = [
   }
 ];
 
+// Corresponding database table names to university names
 var uni_name = {
   'University of Birmingham': 'uni_birmingham',
   'University of Bristol': 'uni_bristol',
@@ -73,6 +53,7 @@ var uni_name = {
   "University of York": 'uni_york'
 }
 
+// Latitude and longitude of each university
 var uni_loc = {
   'University of Birmingham': {lat: 52.448986, lng: -1.930855},
   'University of Bristol': {lat: 51.459064, lng: -2.603292},
@@ -97,38 +78,10 @@ var uni_loc = {
 
 var postcode_info = []
 
-// var first_get = true;
-
 // App Main Component
 class App extends Component {
   constructor(props) {
     super(props);
-
-
-    // this.cheapestHousing = housingData.reduce( (prev, curr) => {
-    //   return prev.avg_price <= curr.avg_price ? prev : curr;
-    // })
-
-    // this.mostExpensiveHousing = housingData.reduce( (prev, curr) => {
-    //   return prev.avg_price >= curr.avg_price ? prev : curr;
-    // })
-
-    // this.closestHousingToUni = housingData.reduce( (prev, curr) => {
-    //   return prev.Distance_to_School <= curr.Distance_to_School ? prev : curr;
-    // })
-
-    // this.farestHousingToUni = housingData.reduce( (prev, curr) => {
-    //   return prev.Distance_to_School >= curr.Distance_to_School ? prev : curr;
-    // })
-
-    // this.closestHousingToRetail = housingData.reduce( (prev, curr) => {
-    //   return prev.Store_Num <= curr.Store_Num ? prev : curr;
-    // })
-
-    // this.farestHousingToRetail = housingData.reduce( (prev, curr) => {
-    //   return prev.Store_Num >= curr.Store_Num ? prev : curr;
-    // })
-
 
     // I need: alphabetically sorted university lists
     this.university_list = ["University of Birmingham", "University of Bristol", "University of Cambridge", "Durham University", "University of Edinburgh", "University of Glasgow", "Imperial College London", "King's College London", "University of Leeds", "University of Liverpool", "London School of Economics", "University of Manchester", "Newcastle University", "University of Nottingham", "University of Oxford", "University of Sheffield", "University of Southampton", "University College London", "University of York"].sort(),
@@ -138,27 +91,10 @@ class App extends Component {
     }
 
     this.state = {
-      // maxP: 0,
-      // minP: 0,
-      // maxDU: 0,
-      // minDU: 0,
-      // maxS: 0,
-      // minS: 0,  
+
       displayHousings: housingData,
       filterState: {
-        // minPrice: this.cheapestHousing.avg_price,
-        // maxPrice: this.mostExpensiveHousing.avg_price,
-        // minDistanceUni: this.closestHousingToUni.Distance_to_School,
-        // maxDistanceUni: this.farestHousingToUni.Distance_to_School,
-        // minDistanceRetail: this.closestHousingToRetail.Store_Num,
-        // maxDistanceRetail: this.farestHousingToRetail.Store_Num,
-        // uniName: this.university_list,
 
-        // rentPreference:0,
-        // safetyPreference:0,
-        // distanceUniPreference:0,
-        // distanceRetailPreference:0,
-        // alphabeticalSort: true,
         minPrice: 0,
         maxPrice: 100,
         minDistanceUni: 0,
@@ -180,6 +116,7 @@ class App extends Component {
     }
   };
 
+  // Update state when users sumbit their preferences
   update() {
     var cheapestHousing = housingData.reduce( (prev, curr) => {
       return prev.avg_price <= curr.avg_price ? prev : curr;
@@ -212,43 +149,16 @@ class App extends Component {
     tempState.maxDistanceUni = farestHousingToUni.Distance_to_School;
     tempState.minDistanceRetail = closestHousingToRetail.Store_Num;
     tempState.maxDistanceRetail = farestHousingToRetail.Store_Num
-    // var universityQuery = tempState.uniName[0];
-    //   //if all university show all
-    // console.log(universityQuery);
-    // if(universityQuery == "All Universities"){
-    //   tempState.uniName = "";
-    // }
-    // console.log('#############',tempState)
 
     this.setState({
       filterState: tempState
     })
-
   }
 
-  // componentDidMount() {
-  //   fetch('http://localhost:5000/test'
-  //   // , { 
-  //   //   method: 'GET',
-  //   //   headers:{
-  //   //     'Access-Control-Allow-Origin': '*',
-  //   //     'Access-Control-Allow-Credentials':true,
-  //   //     'Access-Control-Allow-Methods':'POST, GET'
-  //   //   }
-  //   // }
-  //   )
-  //     .then(res => {
-  //       console.log(res);
-  //       return res.text();
-  //     })
-  //     .then(data => {
-  //       console.log(data);
-  //       this.setState({ data });
-  //     });
-  //     }
+  // Get all information set by user
   handleGet = event => {
     event.preventDefault();
-    console.log('---------------',this.state.filterState)
+    // console.log('---------------',this.state.filterState)
     this.houseGet(this.state.filterState.uniName,
                   this.state.filterState.rentPreference,
                   this.state.filterState.safetyPreference,
@@ -260,21 +170,22 @@ class App extends Component {
                   this.state.filterState.maxDistanceUni,
                   this.state.filterState.minDistanceRetail,
                   this.state.filterState.maxDistanceRetail)   
-
   }
 
+  // Call the function to get overall information of the selected university
   handleGetUni = event => {
       event.preventDefault();
         this.getUniHouse(this.state.filterState.uniName)
     }
 
+  // // 
+  // handleChange = event => {
+  //       this.setState({
+  //           [event.target.id]: event.target.value
+  //       });
+  //   }
 
-  handleChange = event => {
-        this.setState({
-            [event.target.id]: event.target.value
-        });
-    }
-
+  // Call the api to get overall information of the selected university
   async getUniHouse (uni) {
     var uniName = uni_name[uni];
     try {
@@ -286,9 +197,9 @@ class App extends Component {
     }
     housingData = [];
     this.applyFilters()
-
   }
 
+  // Store the information after calling the api to get recommendation of houses
   storePostcodeInfo = (infos) => {
     
     var house_postcode_info = {};
@@ -312,13 +223,11 @@ class App extends Component {
     }
     postcode_info = Object.values(house_postcode_info);
     console.log(postcode_info)
-    //console.log(house_postcode_info)
-
   }
   
-
+  // Call the api to get recommendation of houses 
   async houseGet (uni, rent, safety, disUni, disRetail, minPrice, maxPrice, minDisUni, maxDisUni, minDisRetail, maxDisRetail){
-    // console.log(rent, safety, disRetail, disUni)
+    
     var uniName = uni_name[uni];
     if (rent === 0 && safety === 0 && disUni === 0 && disRetail === 0) {
       rent = safety = disUni = disRetail = 100;
@@ -328,7 +237,7 @@ class App extends Component {
     var safety_s = safety/total;
     var disRetail_s = disRetail/total;
     var disUni_s = disUni/total;
-    //console.log(total, rent_s, safety_s, disRetail_s, disUni_s);
+
     try{ 
       await fetch(`http://localhost:4000/api/get?uni=${uniName}&rent=${rent_s}&safety=${safety_s}\
                    &disUni=${disUni_s}&disRetail=${disRetail_s}&minPrice=${minPrice}\
@@ -338,11 +247,7 @@ class App extends Component {
       .then(res => res.json()
       )
       .then(uni => 
-
-          //console.log(uni);
-          // (this.setState({uni: uni}))
           (housingData = uni)
-          //console.log(uni);
       )} 
       catch (e) {
       alert(e);
@@ -351,52 +256,16 @@ class App extends Component {
     
     this.storePostcodeInfo(housingData);
     this.applyFilters();
-      
   }
 
-  // housePost(school) {
-  //       console.log(school);
-  //       fetch(`http://localhost:4000/api/post?school=${school}`)
-  //           .then(res => res.text())
-  //           .then(uni => {
-  //               console.log(uni)
-  //               this.setState({ uni });
-  //           })
-  //           .catch(err => console.error(err))
-  //   }
-
-  
-
-
-  // apply filters
+  // Apply filter when users change preferences
   applyFilters = () => {
-    //console.log('---------',housingData)
     if (housingData.length != 0) {
       this.update();
     }
     var filterState = this.state.filterState;
-
-    //console.log('++++++++++', housingData);
-    // if (first_get == true){
-    //   this.setState({
-    //     minP: Number(filterState.minPrice.toFixed(0)),
-    //     maxP: Number(filterState.maxPrice.toFixed(0)),
-    //     minDU: Number(filterState.minDistanceUni.toFixed(0)),
-    //     maxDU: Number(filterState.maxDistanceUni.toFixed(0)),
-    //     minS: filterState.minDistanceRetail,
-    //     maxS: filterState.maxDistanceRetail,
-    //   });
-    //   first_get = false
-    // }
-
     var displayHousings = housingData.filter( housing => {
 
-      var universityQuery = filterState.uniName[0];
-      //if all university show all
-      // if(universityQuery == "All Universities"){
-      //   universityQuery = "";
-      // }
-      //console.log("here: " + universityQuery);
       // vars for price filter
       var minPrice = filterState.minPrice;
       var maxPrice = filterState.maxPrice;
@@ -407,24 +276,19 @@ class App extends Component {
       var minDistanceRetail = filterState.minDistanceRetail;
       var maxDistanceRetail = filterState.maxDistanceRetail;
 
-      // var rentPreference = filterState.rentPreference;
-      // var safetyPreference = filterState.safetyPreference;
-      // var distanceUniPreference = filterState.distanceUniPreference;
-      // var distanceRetailPreference = filterState.distanceRetailPreference;
-
       return (
         (minPrice <= housing.avg_price && housing.avg_price <= maxPrice)
         &&(minDistanceUni <= housing.Distance_to_School && housing.Distance_to_School <= maxDistanceUni)
         &&(minDistanceRetail <= housing.Store_Num && housing.Store_Num <= maxDistanceRetail)
       )
     })
-    //console.log('666666', displayHousings)
+
     this.setState({displayHousings: displayHousings});
   }
 
+  // Price filter
   setPriceFilter = (event) => {
-    //console.log('++++++', event)
-    //console.log("Price Filter", event[0], event[1]);
+
     this.state.filterState.minPrice = event[0];
     this.state.filterState.maxPrice = event[1];
     
@@ -435,23 +299,23 @@ class App extends Component {
       filterState: tempState
     })
     console.log(this.state.filterState)
-    //this.applyFilters();
   }
 
+  // Distance filter
   setUniDistanceFilter = (event) => {
     console.log("UniDistance Filter", event[0], event[1]);
     this.state.filterState.minDistanceUni = event[0];
     this.state.filterState.maxDistanceUni = event[1];
-    //this.applyFilters();
   }
 
+  // Number of retails filter
   setRetailDistanceFilter = (event) => {
     console.log("RetailDistance Filter", event[0], event[1]);
     this.state.filterState.minDistanceRetail = event[0];
     this.state.filterState.maxDistanceRetail = event[1];
-    //this.applyFilters();
   }
 
+  // University filter
   setUniversityFilter = (item) => {
     if (item) {
       console.log("Set university Filter: ", [item.name]);
@@ -470,39 +334,43 @@ class App extends Component {
     }
   }
 
+  // Set rent preference
   setRentPreference = (event) => {
     console.log("RentPreference Filter", event);
     this.state.filterState.rentPreference = event;
     this.applyFilters();
   }
 
+  // Set safety preference
   setSafetyPreference = (event) => {
     console.log("safetyPreference Filter", event);
     this.state.filterState.safetyPreference = event;
     this.applyFilters();
   }
 
+  // Set distance preference
   setDistanceUniPreference = (event) => {
     console.log("DistanceUniPreference Filter", event);
     this.state.filterState.distanceUniPreference = event;
     this.applyFilters();
   }
 
+  // Set the nubmer of retails preference
   setdistanceRetailPreference = (event) => {
     console.log("distanceRetailPreference Filter", event);
     this.state.filterState.distanceRetailPreference = event;
     this.applyFilters();
   }
 
+  // Render the page
   render() {
-    //console.log("Render App: ", this.state.displayHousings);
+
     return (
         <div className="container">
           <div className="logo">
             <img src={logo} width="120" height="60" />
           </div>
          
-
           {/* New Row */}
           <br/>
           <br/>
@@ -515,8 +383,6 @@ class App extends Component {
             </div>
 
             {/*new col*/}
-
-
             <div className="col-xs-3">
 
             <div className="row">
@@ -530,8 +396,7 @@ class App extends Component {
               customTagClass="dropdown-select-tag"
             />
           </div><br/>
-
-            
+  
             <div className="row sliderTitle"> Rent</div>
             <div className="row">
               <div className="col-xs-2 default">
@@ -659,11 +524,6 @@ class App extends Component {
                 </div>
             </div>
 
-            {/* <form>
-              <input id='school' value={this.state.school || ''} onChange={this.handleChange}></input>
-              <button onClick={this.handlePost}>post</button>
-              <button onClick={this.handleGet}>get</button>
-            </form> */}
             <button className='button' onClick={this.handleGet}>Submit</button>
 
           </div>
@@ -674,6 +534,7 @@ class App extends Component {
   }
 }
 
+// Call the google map api
 const MapComponent = compose(
 
   withProps({
@@ -693,120 +554,20 @@ const MapComponent = compose(
   >
     {
       props.housings.map((housing) => {
-      // console.log('==========')
-
         return(
             <CustomerMarkerAndInfo key={housing.id} housing = { housing }/>
           )
         }
-      )
-      
-      
+      )  
     }
   </GoogleMap>
-  // if (select_uni == true) {
-  //   {console.log('000000000')}
-    
-  //   <GoogleMap
-  //     defaultZoom={6.1}
-  //     defaultCenter={{ lat: 53.03, lng: -2.1 }}
-  //   >
-  //     { 
-  //       function (props) {
-  //         console.log('1111')
-  //         return(
-  //           <CustomerMarkerAndInfo key={props.housings.id} housing = { props.housings }/>
-  //       )}
-  //     }
-      
-  //   </GoogleMap>
-  // }
-  // else {
-  //   <GoogleMap
-  //     defaultZoom={6.1}
-  //     defaultCenter={{ lat: 53.03, lng: -2.1 }}
-  //   >
-  //     {
-  //       props.housings.map((housing) => {
-  //         console.log('2222')
-  //         return(
-  //             <CustomerMarkerAndInfo key={housing.id} housing = { housing }/>
-  //           )
-  //         }
-  //       )
-  //     }
-  //   </GoogleMap>
-
-  // }
-
 );
 
-// class CustomerMarkerAndInfo extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//         isOpen: false,
-//         hovered: false,
-
-//     };
-//   }
-//   onClickOpen=()=>{
-//     if(this.state.isOpen === true){
-//       this.setState({isOpen: !this.state.isOpen, hovered: false});
-//     }
-//     else{
-//       this.setState({isOpen: !this.state.isOpen, hovered: false});
-//     }
-//   }
-//   onHoverOver=()=>{
-//     if(this.state.isOpen === false && this.state.hovered === false){
-//       this.setState({isOpen: false, hovered: true});
-//     }
-//   }
-//   onHoverOut=()=>{
-//     if(this.state.isOpen === false && this.state.hovered === true){
-//       this.setState({isOpen: false, hovered: false});
-//     }
-//   }
-//   render() {
-//     return (
-//       <Marker key={this.state.isOpen}
-//               position={this.props.housing.position}
-//               onClick={this.onClickOpen.bind(this)}
-//               onMouseOver={this.onHoverOver.bind(this)}
-//               onMouseOut={this.onHoverOut.bind(this)}
-//               icon ={this.state.icon}
-//               >
-//           {this.state.hovered && <InfoWindow>
-//                                       <span><b>{this.props.housing.city} / {this.props.housing.uniName}</b>
-//                                       <br/>Click to view more info
-//                                       </span></InfoWindow>}
-//           {this.state.isOpen && <InfoWindow onCloseClick={this.onClickOpen.bind(this)}>
-//                                       <span><b>{this.props.housing.city} / {this.props.housing.uniName}</b>
-//                                       <br/>{this.props.housing.tel}
-//                                       <br/><a href= '_blank'>{this.props.housing.website}</a >
-//                                       </span></InfoWindow>}
-//           </Marker>
-//         )
-//     }
-// }
-
-
+// Render the map
 class CustomerMarkerAndInfo extends Component {
   constructor(props) {
     super(props);
 
-    // var pos = {}
-    // if (select_uni == true) {
-    //   var uniname = this.props.housing.uniName
-    //   console.log(uniname)
-    //   pos =  uni_loc[uniname]
-    // }
-    // else{
-    //   pos = {
-    //     lat: this.props.housing.Latitude,
-    //     lng: this.props.housing.Longitude}
-    // }
 
     this.state = {
         isOpen: false,
@@ -817,18 +578,7 @@ class CustomerMarkerAndInfo extends Component {
 
     };
 
-    //console.log(pos)
   }
-
-
-  // showOnlyUni=()=>{
-  //   if (select_uni == ture) {
-  //     var uniname = this.props.housing.universityName
-  //     this.setState({
-  //       position: uni_loc[uniname]
-  //     })
-  //   }
-  // }
 
   onClickOpen=()=>{
     if(this.state.isOpen === true){
@@ -850,7 +600,6 @@ class CustomerMarkerAndInfo extends Component {
   }
   
   render() {
-    // console.log('-------------');
     return (
       <Marker key={this.state.isOpen}
               position={this.state.position}
