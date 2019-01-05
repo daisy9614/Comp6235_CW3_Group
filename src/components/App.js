@@ -108,7 +108,7 @@ class App extends Component {
         rentPreference:0,
         safetyPreference:0,
         distanceUniPreference:0,
-        retailCountPreference:0,
+        distanceRetailPreference:0,
         alphabeticalSort: true,
       },
       uni: null,
@@ -222,7 +222,6 @@ class App extends Component {
       }
     }
     postcode_info = Object.values(house_postcode_info);
-    console.log(postcode_info)
   }
 
   // Call the api to get recommendation of houses
@@ -273,8 +272,8 @@ class App extends Component {
       var minDistanceUni = filterState.minDistanceUni;
       var maxDistanceUni = filterState.maxDistanceUni;
       //vars for distance retail filter
-      var minRetailCount = filterState.minRetailCount;
-      var maxRetailCount = filterState.maxRetailCount;
+      var minDistanceRetail = filterState.minDistanceRetail;
+      var maxDistanceRetail = filterState.maxDistanceRetail;
 
       return (
         (minPrice <= housing.avg_price && housing.avg_price <= maxPrice)
@@ -298,7 +297,6 @@ class App extends Component {
     this.setState({
       filterState: tempState
     })
-    console.log(this.state.filterState)
   }
 
   // Distance filter
@@ -515,11 +513,11 @@ class App extends Component {
                 <Slider
                   step={1}
                   defaultValue={0}
-                  onChange={this.setRetailCountPreference}
+                  onChange={this.setdistanceRetailPreference}
                 />
                 </div>
                 <div className="col-xs-2 default">
-                  <p>{this.state.filterState.retailCountPreference}%</p>
+                  <p>{this.state.filterState.distanceRetailPreference}%</p>
                 </div>
                 </div>
             </div>
